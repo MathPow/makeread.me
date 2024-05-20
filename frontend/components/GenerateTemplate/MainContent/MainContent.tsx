@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react"
-import { IFunction, readMeGenerator } from "@/api/generated"
+import { IDefaultBlockInput, IFunction } from "@/api/generated"
 
 import CopyButton from "./CopyButton"
 import DownloadButton from "./DownloadButton"
 import Editor from "./Editor/Editor"
-import Preview from "./Preview"
+import Preview from "./Editor/Preview/Preview"
 import { compileString } from "./generator"
+import { useQuery } from "@tanstack/react-query"
+import RawText from "./Editor/RawText/RawText"
+import { EditModeOne, EditModeTwo, EditModeThree } from "./types"
+import MainContentTabs from "./Tabs/MainContentTabs"
+import ToggleViewButton from "./Tabs/ToggleViewButton"
+import TabContent from "./Tabs/TabContent"
+import { api } from "@/lib/apiWrapper"
 
 const MainContent: React.FC<{
   templateId: string
@@ -16,35 +23,45 @@ const MainContent: React.FC<{
   const [variables, setVariables] = useState<Record<string, any>>({})
   const [output, setOutput] = useState<string>("")
 
-  const PopulateTemplateData = async () => {
-    // For now lets hardcode the templateId -> Should grab from the URL
+  const populateTemplateData = useQuery({
+    queryKey: ["getV1TemplateTemplateDefaultBlocks", templateId],
+    queryFn: async () => {
+      let index = await api.template.getV1TemplateTemplateDefaultBlocks(
+        templateId
+      )
 
-    let index = await new readMeGenerator().template.getV1TemplateIndex(
-      templateId
-    )
-
-    if (index.success && index.responseObject) {
-      const data: IFunction[] = index.responseObject
-      setTemplateBlocks(data)
-    }
-  }
-
-  const PopulateMacrosData = async () => {
-    const request = await new readMeGenerator().template.getV1TemplateMacros(
-      templateId
-    )
-
-    if (request.success && request.responseObject) {
-      const data: string = request.responseObject
-      setMacros(data)
-    }
-  }
+      return index.responseObject as IFunction[]
+    },
+  })
 
   useEffect(() => {
-    PopulateTemplateData()
-    PopulateMacrosData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    if (populateTemplateData.status === "success") {
+      setTemplateBlocks(populateTemplateData.data!)
+    }
+  }, [populateTemplateData.data, populateTemplateData.status])
+
+  const populateMacrosData = useQuery({
+    queryKey: ["postV1TemplateTemplateMacros", templateBlocks],
+    queryFn: async () => {
+      const blocksMapped: IDefaultBlockInput[] = templateBlocks.map(
+        (block: IFunction) => ({
+          function: block.function,
+          folder: block.folder,
+        })
+      )
+
+      let request = await api.template.postV1TemplateTemplateMacros(blocksMapped)
+
+      return request.responseObject as string
+    },
+    enabled: populateTemplateData.data && populateTemplateData.status === "success",
+  })
+
+  useEffect(() => {
+    if (populateMacrosData.status === "success") {
+      setMacros(populateMacrosData.data!)
+    }
+  }, [populateMacrosData.data, populateMacrosData.status])
 
   const generateOutput = () => {
     if (macros && templateBlocks && variables) {
@@ -54,32 +71,52 @@ const MainContent: React.FC<{
   }
 
   useEffect(() => {
-    generateOutput()
+    const doesFunctionsExist = templateBlocks.every((block) => {
+      return macros.includes(block.function)
+    })
+
+    if (populateTemplateData.isLoading === false && populateMacrosData.isLoading === false && doesFunctionsExist) {
+      generateOutput()
+    }
   }, [variables, templateBlocks, macros])
+
+  const [numberOfViewsToShow, setNumberOfViewsToShow] = useState<number>(2)
+  const [editMode, setEditMode] = useState<EditModeOne | EditModeTwo | EditModeThree>(EditModeTwo.EDIT_PREVIEW)
 
   return (
     <div className="flex flex-col">
       <main className="flex flex-1 flex-col gap-4 p-4 xl:gap-6 xl:p-6">
-        {/* Sub-navbar */}
-        <div className="flex items-center justify-end gap-6">
-          <CopyButton copiedText={output} />
-          <DownloadButton downloadText={output} fileName={"README.md"} />
+        <div className="flex items-center justify-between gap-6">
+          <div className="flex gap-6 items-center justify-center">
+            <ToggleViewButton numberOfViewsToShow={numberOfViewsToShow} setNumberOfViewsToShow={setNumberOfViewsToShow} setEditMode={setEditMode} />
+            <MainContentTabs numberOfViewsToShow={numberOfViewsToShow} editMode={editMode} setEditMode={setEditMode} />
+          </div>
+
+          <div className="flex gap-6 items-center justify-end">
+            <CopyButton copiedText={output} />
+            <DownloadButton downloadText={output} fileName={"README.md"} />
+          </div>
         </div>
 
         {/* Content */}
-        <div className="rounded-lg border border-dashed shadow-sm xl:flex xl:flex-1 xl:items-start xl:justify-center">
-          {/* Place Content Here */}
-          <Editor
-            templateBlocks={templateBlocks}
-            setTemplateBlocks={setTemplateBlocks}
-            variables={variables}
-            setVariables={setVariables}
-          />
-
-          <Preview output={output} />
-        </div>
-      </main>
-    </div>
+        <TabContent numberOfViewsToShow={numberOfViewsToShow} editMode={editMode}
+          Editor={
+            <Editor
+              templateBlocks={templateBlocks}
+              setTemplateBlocks={setTemplateBlocks}
+              variables={variables}
+              setVariables={setVariables}
+            />
+          }
+          Preview={
+            <Preview output={output} />
+          }
+          RawText={
+            <RawText output={output} />
+          }
+        />
+      </main >
+    </div >
   )
 }
 

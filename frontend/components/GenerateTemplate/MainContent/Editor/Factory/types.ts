@@ -1,9 +1,9 @@
 import {
-  IVariable,
   IVariableCheckBox,
   IVariableInput,
   IVariableList,
   IVariableObject,
+  IVariableRadio,
   IVariableSelect,
   IVariableTextArea,
 } from "@/api/generated"
@@ -36,5 +36,10 @@ export interface IObjectFieldProps {
 
 export interface ISelectFieldProps {
   variables: IVariableSelect
+  control: Control
+}
+
+export interface IRadioFieldProps {
+  variables: IVariableRadio
   control: Control
 }

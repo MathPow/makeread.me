@@ -10,13 +10,17 @@ export const siteConfig = {
       href: "/",
     },
     {
-      title: "Template",
+      title: "Select A Template",
       href: "/select-template",
     },
-    // {
-    //   title: "Scratch",
-    //   href: "/generator",
-    // },
+    {
+      title: "Create Your Own",
+      href: "/generator",
+    },
+    {
+      title: "Contributors",
+      href: "/contributors",
+    }
   ],
   links: {
     twitter: "https://twitter.com/ShaanCoding",
@@ -33,13 +37,17 @@ export const siteConfig = {
         href: "/",
       },
       {
-        title: "Select Template",
+        title: "Select A Template",
         href: "/select-template",
       },
-      // {
-      //   title: "Make My Own",
-      //   href: "/generator",
-      // },
+      {
+        title: "Create Your Own",
+        href: "/generator",
+      },
+      {
+        title: "Contributors",
+        href: "/contributors",
+      }
     ],
     socialMedia: [
       {
@@ -70,7 +78,7 @@ export const siteConfig = {
         href: "/select-template",
       },
     },
-    demo: "/Demo.svg",
+    demo: "/Demo.jpg",
     keyFeatures: [
       {
         image: "/icons/home/templateReadMEGeneration.svg",
@@ -118,7 +126,7 @@ export const siteConfig = {
         image: "/icons/home/richSetOfTemplates.svg",
         title: "Rich Set of Contributing Templates",
         description:
-        "Utilize a wide selection of ReadME templates created and shared by our passionate and experienced community members.",
+          "Utilize a wide selection of ReadME templates created and shared by our passionate and experienced community members.",
       },
       {
         image: "/icons/home/gptFunctionality.svg",
@@ -136,17 +144,20 @@ export const siteConfig = {
     },
     testimonials: [
       {
-        name: "dLyan",
+        name: "dylanheaslip",
+        imageURL: "/testimonials/dylanheaslip.png",
         title: "User",
         testimony: `"I can't believe how easy it was to create an amazing ReadME with makeread.me. Highly recommended to all developers!"`,
       },
       {
         name: "ShaanCoding",
+        imageURL: "/testimonials/shaancoding.jpg",
         title: "Creator",
         testimony: `"Whilst I've used many ReadME Generator tools in the past, I've often found myself manually rekeying the same information over and over again when starting a project. With templating, I'm able to ship faster, and worry less about making the perfect ReadME."`,
       },
       {
-        name: "Massimo",
+        name: "mianni1",
+        imageURL: "/testimonials/mianni1.png",
         title: "User",
         testimony: `"Makeread.me has significantly reduced my documentation time, making READMEs clear and concise. Its customizable template suits all my project needs and has optimised my workflow by allowing me more time for development. A must-try for any developer!"`,
       },

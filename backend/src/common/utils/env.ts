@@ -18,7 +18,7 @@ BASE_URL
 
 const listOfErrorMessages: string[] = []
 
-export const NODE_ENV = process.env.NODE_ENV
+const NODE_ENV = process.env.NODE_ENV!
 
 if (!NODE_ENV) {
     listOfErrorMessages.push('No NODE_ENV set')
@@ -31,22 +31,19 @@ export enum Environment {
 
 export const PRODUCTION_OR_DEVELOPMENT: Environment = NODE_ENV === 'prod' ? Environment.PRODUCTION : Environment.DEVELOPMENT
 
-export const PORT = process.env.PORT
+export const PORT = process.env.PORT!
 
 if (!PORT) {
     listOfErrorMessages.push('No PORT set')
 }
 
-export const FRONTEND_URL = process.env.FRONTEND_URL
-export const BASE_URL = process.env.BASE_URL
+export const MONGO_PRIVATE_URL = process.env.MONGO_PRIVATE_URL!
 
-if (!FRONTEND_URL) {
-    listOfErrorMessages.push('No FRONTEND_URL set')
-}
-
-if (!BASE_URL) {
-    listOfErrorMessages.push('No BASE_URL set')
-}
+if (PRODUCTION_OR_DEVELOPMENT === Environment.PRODUCTION) {
+    if(!MONGO_PRIVATE_URL) {
+        listOfErrorMessages.push('No MONGO_PRIVATE_URL set')
+    }
+} 
 
 if (listOfErrorMessages.length > 0) {
     console.log('Missing environment variables:')

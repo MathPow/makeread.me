@@ -19,18 +19,15 @@ import {
 } from "@/components/ui/card"
 
 import InputGenerator from "./Factory/InputGenerator"
+import ShowMinimizeButton from "@/components/common/ShowMinimizeButton"
 
 const EditorBlock = ({
-  isTransitionUp,
-  isTransitionDown,
   block,
   moveBlockUp,
   moveBlockDown,
   deleteBlock,
   control,
 }: {
-  isTransitionUp: boolean
-  isTransitionDown: boolean
   block: IFunction
   moveBlockUp: () => void
   moveBlockDown: () => void
@@ -49,17 +46,9 @@ const EditorBlock = ({
   return (
     <Card
       id="editor-block"
-      className={`p-4 transition-transform duration-300 transform ${
-        !isTransitionDown && !isTransitionUp && "hover:scale-[1.02]"
-      }
+      className={`p-4 transition-transform duration-300 transform ${isMinimized && "hover:scale-[1.02]"
+        }
       `}
-      style={
-        isTransitionDown
-          ? { transform: `translateY(${getHeight().toString()}px)` }
-          : isTransitionUp
-          ? { transform: `translateY(-${getHeight().toString()}px)` }
-          : {}
-      }
     >
       <CardHeader>
         <div className="mb-2 xl:mb-4">
@@ -95,22 +84,7 @@ const EditorBlock = ({
             <Trash2Icon className="mr-2" />
             Delete
           </Button>
-          <Button
-            variant={"outline"}
-            onClick={() => setIsMinimized(!isMinimized)}
-          >
-            {isMinimized ? (
-              <>
-                <PlusIcon className="mr-2" />
-                Show
-              </>
-            ) : (
-              <>
-                <MinusIcon className="mr-2" />
-                Hide
-              </>
-            )}
-          </Button>
+          <ShowMinimizeButton isMinimized={isMinimized} setIsMinimized={setIsMinimized} />
         </div>
       </CardHeader>
       <CardContent className={`${isMinimized ? "hidden" : ""}`}>
